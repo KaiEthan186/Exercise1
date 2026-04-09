@@ -7,38 +7,31 @@ import java.sql.SQLException;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
-    public Connection getConnection() {
+    public Connection getConnection(String flag) {
         Connection con = null;
-        int maxRetries = 5;
-        int attempt = 0;
+        try {
+            Thread.sleep(3000);
 
-        while (con == null && attempt < maxRetries) {
-            attempt++;
-            try {
+            if(flag.equals("yes")){
+                con = DriverManager.getConnection(
+                        "jdbc:mysql://db:3306/test_db?useSSL=false&allowPublicKeyRetrieval=true",
+                        "ethan","1234"
+                );
+            }else{
                 con = DriverManager.getConnection(
                         "jdbc:mysql://localhost:33060/test_db?useSSL=false&allowPublicKeyRetrieval=true",
-                        "ethan",
-                        "1234"
+                        "ethan","1234"
                 );
-
-                System.out.println("connection successful");
-
-            } catch (SQLException ex) {
-                System.out.println("try again connection is out (attempt " + attempt + ")");
-                ex.printStackTrace();
-
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-        }
 
-        if (con == null) {
-            System.out.println("failed to connect after retries");
-        }
+            IO.println("Connected Successful.");
 
+        }
+        catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return con;
     }
 
@@ -116,21 +109,27 @@ public class Main {
     }
 
 
-    static void main() {
+    static void main(String[] args) {
         Main m = new Main();
-        Connection con = m.getConnection();
+        Connection con = null;
+        int count=1;
+        while(con ==null && count<=20){
+            System.out.println("Trying to connect....."+count);
+            if(args.length>0){
+                con=m.getConnection("yes");
 
-      //    m.Insert(con, "11", "Yangon","09941516","Mayangone","Myanmar","111111", "Asia");
-//        m.update(con);
-        //m.delete(con);
-        m.Office_Data(con);
-        //System.out.println("-------------------------");
-        //m.Paris_Employee(con);
-        //System.out.println("-------------------------");
-        System.out.println("-------------------------");
+            }else{
+                con=m.getConnection("no");
+            }
+            count ++;
+        }
+
 
         try{
             if(con !=null){
+                System.out.println("-------------------------");
+                m.Office_Data(con);
+                System.out.println("-------------------------");
                 con.close();
             }
         }
