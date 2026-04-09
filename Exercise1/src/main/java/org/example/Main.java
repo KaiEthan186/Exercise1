@@ -9,15 +9,36 @@ public class Main {
 
     public Connection getConnection() {
         Connection con = null;
-        try {
-            con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:33060/test_db?useSSL=false&allowPublicKeyRetrieval=true", "ethan", "1234"
-            );
-            IO.println("Connected Successful.");
+        int maxRetries = 5;
+        int attempt = 0;
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        while (con == null && attempt < maxRetries) {
+            attempt++;
+            try {
+                con = DriverManager.getConnection(
+                        "jdbc:mysql://localhost:33060/test_db?useSSL=false&allowPublicKeyRetrieval=true",
+                        "ethan",
+                        "1234"
+                );
+
+                System.out.println("connection successful");
+
+            } catch (SQLException ex) {
+                System.out.println("try again connection is out (attempt " + attempt + ")");
+                ex.printStackTrace();
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+        if (con == null) {
+            System.out.println("failed to connect after retries");
+        }
+
         return con;
     }
 
@@ -99,7 +120,7 @@ public class Main {
         Main m = new Main();
         Connection con = m.getConnection();
 
-          m.Insert(con, "11", "Yangon","09941516","Mayangone","Myanmar","111111", "Asia");
+      //    m.Insert(con, "11", "Yangon","09941516","Mayangone","Myanmar","111111", "Asia");
 //        m.update(con);
         //m.delete(con);
         m.Office_Data(con);
@@ -107,6 +128,15 @@ public class Main {
         //m.Paris_Employee(con);
         //System.out.println("-------------------------");
         System.out.println("-------------------------");
+
+        try{
+            if(con !=null){
+                con.close();
+            }
+        }
+        catch(SQLException ex){
+            ex.printStackTrace();
+        }
     }
 
 }

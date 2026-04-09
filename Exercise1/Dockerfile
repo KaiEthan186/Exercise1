@@ -1,5 +1,5 @@
 FROM eclipse-temurin:25
 LABEL authors="Thant Phyo Maung"
-COPY ./target/classes/org /tmp/org
+COPY ./target/testproject.jar /tmp
 WORKDIR /tmp
-ENTRYPOINT ["java", "org.example.Main"]
+ENTRYPOINT ["java","-jar", "testproject.jar"]
